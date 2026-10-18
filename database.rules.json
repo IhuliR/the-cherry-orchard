@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "timer": {
+      ".read": true,
+      ".write": "auth !== null && auth.uid === 's5Ss40x2ZjaukMDedkWlRr73LZj1' && newData.exists()",
+      ".validate": "newData.hasChildren(['remainingMs', 'running', 'rate', 'updatedAt'])",
+      "remainingMs": {
+        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2880000"
+      },
+      "running": {
+        ".validate": "newData.isBoolean()"
+      },
+      "rate": {
+        ".validate": "newData.isNumber() && (newData.val() === 0.25 || newData.val() === 0.5 || newData.val() === 1 || newData.val() === 1.5 || newData.val() === 2 || newData.val() === 4)"
+      },
+      "updatedAt": {
+        ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= now + 60000"
+      },
+      "$other": {
+        ".validate": false
+      }
+    }
+  }
+}

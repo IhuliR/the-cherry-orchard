@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101215">
+  <meta name="description" content="Пульт управления театральным таймером">
+  <title>Пульт · Театральные часы</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="control-page">
+  <main class="control-shell">
+    <header class="control-header">
+      <div>
+        <p class="eyebrow">ТЕАТРАЛЬНЫЙ ПЕРФОРМАНС</p>
+        <h1>Управление временем</h1>
+      </div>
+      <div class="connection-indicators">
+        <span class="connection-pill" id="connection-status">● Подключение…</span>
+        <span id="mode" class="mode-pill">Загрузка…</span>
+      </div>
+    </header>
+    <div class="demo-banner" id="demo-banner" hidden>
+      Демо-режим: можно испытать часы в двух вкладках одного браузера. Для разных устройств настройте Firebase.
+    </div>
+    <section class="preview-card" aria-label="Текущее время">
+      <div id="preview-clock" class="preview-clock"></div>
+      <div class="preview-meta">
+        <span id="play-status">На паузе</span>
+        <span id="speed-label">Скорость: 1×</span>
+      </div>
+      <span class="sr-only" id="text-time" aria-live="off">00:48:00</span>
+    </section>
+
+    <section id="auth-panel" class="panel" aria-label="Вход в панель управления">
+      <h2>Войти как оператор</h2>
+      <p class="subtle">Управлять часами может только авторизованный оператор.</p>
+      <form id="login" class="login-form">
+        <label>Email <input id="email" type="email" autocomplete="username" required placeholder="operator@example.com"></label>
+        <label>Пароль <input id="password" type="password" autocomplete="current-password" required placeholder="••••••••"></label>
+        <button type="submit" id="login-submit" class="button button-primary">Войти</button>
+      </form>
+    </section>
+
+    <div id="controls" hidden>
+      <section class="panel" aria-labelledby="play-heading">
+        <div class="panel-top"><h2 id="play-heading">Отсчёт</h2><span class="subtle">Пауза сохраняет время</span></div>
+        <div class="button-row main-actions">
+          <button id="toggle" class="button button-primary" data-command="toggle" disabled>▶ Запустить</button>
+          <button id="reset" class="button button-muted" data-command="reset" disabled>↺ Сбросить до 48:00</button>
+        </div>
+      </section>
+      <section class="panel" aria-labelledby="speed-heading">
+        <div class="panel-top"><h2 id="speed-heading">Скорость</h2><span class="subtle">Можно менять на ходу</span></div>
+        <div class="speed-buttons">
+          <button class="button speed-button" data-command="speed" data-speed="0.25" disabled>0.25×</button>
+          <button class="button speed-button" data-command="speed" data-speed="0.5" disabled>0.5×</button>
+          <button class="button speed-button selected" data-command="speed" data-speed="1" aria-pressed="true" disabled>1×</button>
+          <button class="button speed-button" data-command="speed" data-speed="1.5" disabled>1.5×</button>
+          <button class="button speed-button" data-command="speed" data-speed="2" disabled>2×</button>
+          <button class="button speed-button" data-command="speed" data-speed="4" disabled>4×</button>
+        </div>
+      </section>
+      <section class="panel" aria-labelledby="set-heading">
+        <div class="panel-top"><h2 id="set-heading">Установить время</h2><span class="subtle">После установки будет пауза</span></div>
+        <div class="set-time">
+          <label>Минуты <input id="minutes" type="number" inputmode="numeric" min="0" max="48" value="47"></label>
+          <span class="time-separator">:</span>
+          <label>Секунды <input id="seconds" type="number" inputmode="numeric" min="0" max="59" value="59"></label>
+          <button id="set-time" data-command="set" class="button button-muted" disabled>Установить</button>
+        </div>
+      </section>
+      <div class="footer-actions"><button id="logout" type="button" class="text-button">Выйти из аккаунта</button><a href="./" target="_blank" rel="noopener">Открыть часы ↗</a></div>
+    </div>
+    <p role="status" id="feedback" class="feedback" aria-live="polite"></p>
+    <footer>Пульт оператора · Состояние сохраняется между перезагрузками страницы</footer>
+  </main>
+  <script type="module" src="js/control.js"></script>
+</body>
+</html>
