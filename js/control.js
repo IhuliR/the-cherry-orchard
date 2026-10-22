@@ -1,6 +1,6 @@
 import { createConnection } from './connection.js';
 import { createSevenSegment } from './segments.js';
-import { DURATION_MS, formatTime, initialState, remainingAt, RATES } from './engine.js';
+import { DURATION_MS, formatTime, initialState, isRunningAt, MIN_REMAINING_MS, remainingAt } from './engine.js';
 
 const el = (id) => document.getElementById(id);
 const digits = createSevenSegment(el('preview-clock'));
@@ -18,10 +18,12 @@ function showFeedback(text, isError = false) {
 
 function updateButtons() {
   const canEdit = authorized && connected && !busy;
+  const now = connection ? connection.getNow() : Date.now();
+  const running = isRunningAt(state, now);
   for (const button of document.querySelectorAll('[data-command], #set-time')) {
     button.disabled = !canEdit;
   }
-  el('toggle').textContent = state.running ? '⏸ Пауза' : '▶ Запустить';
+  el('toggle').textContent = running ? '⏸ Пауза' : '▶ Запустить';
   for (const button of document.querySelectorAll('[data-speed]')) {
     const selected = Number(button.dataset.speed) === state.rate;
     button.classList.toggle('selected', selected);
@@ -30,14 +32,15 @@ function updateButtons() {
 }
 
 function render() {
-  const remaining = connection ? remainingAt(state, connection.getNow()) : state.remainingMs;
+  const now = connection ? connection.getNow() : Date.now();
+  const remaining = remainingAt(state, now);
+  const running = isRunningAt(state, now);
   const value = formatTime(remaining);
   digits.set(value);
   el('text-time').textContent = value;
   el('speed-label').textContent = `Скорость: ${state.rate}×`;
-  el('play-status').textContent = state.running && remaining > 0 ? 'Идёт отсчёт' : (remaining <= 0 ? 'Время вышло' : 'На паузе');
-  if (state.running && remaining <= 0) el('toggle').textContent = '▶ Запустить';
-  else el('toggle').textContent = state.running ? '⏸ Пауза' : '▶ Запустить';
+  el('play-status').textContent = running ? 'Идёт отсчёт' : (remaining <= MIN_REMAINING_MS ? 'Отсчёт завершён' : 'На паузе');
+  el('toggle').textContent = running ? '⏸ Пауза' : '▶ Запустить';
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
@@ -58,7 +61,10 @@ async function command(action) {
   }
 }
 
-el('toggle').addEventListener('click', () => command({ type: state.running ? 'pause' : 'play' }));
+el('toggle').addEventListener('click', () => {
+  const now = connection ? connection.getNow() : Date.now();
+  command({ type: isRunningAt(state, now) ? 'pause' : 'play' });
+});
 el('reset').addEventListener('click', () => {
   if (confirm('Вернуть 00:48:00 и поставить часы на паузу?')) command({ type: 'reset' });
 });
@@ -68,11 +74,12 @@ for (const button of document.querySelectorAll('[data-speed]')) {
 el('set-time').addEventListener('click', () => {
   const minutes = Number(el('minutes').value);
   const seconds = Number(el('seconds').value);
-  if (!Number.isInteger(minutes) || !Number.isInteger(seconds) || minutes < 0 || seconds < 0 || seconds > 59 || (minutes * 60 + seconds) * 1000 > DURATION_MS) {
-    showFeedback('Укажи время от 00:00 до 48:00', true);
+  const remainingMs = (minutes * 60 + seconds) * 1000;
+  if (!Number.isInteger(minutes) || !Number.isInteger(seconds) || minutes < 0 || seconds < 0 || seconds > 59 || remainingMs < MIN_REMAINING_MS || remainingMs > DURATION_MS) {
+    showFeedback('Укажи время от 00:01 до 48:00', true);
     return;
   }
-  command({ type: 'set', remainingMs: (minutes * 60 + seconds) * 1000 });
+  command({ type: 'set', remainingMs });
 });
 
 try {
