@@ -29,7 +29,7 @@ export function createSevenSegment(container) {
   const svg = svgElement('svg', {
     viewBox: '0 0 760 160',
     role: 'img',
-    'aria-label': '00:48:00',
+    'aria-label': '00:46:00',
     preserveAspectRatio: 'xMidYMid meet',
     class: 'seven-segment',
   });
@@ -68,6 +68,6 @@ export function createSevenSegment(container) {
       });
     });
   }
-  set('00:48:00');
+  set('00:46:00');
   return { set };
 }
