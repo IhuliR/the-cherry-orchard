@@ -3,15 +3,18 @@
     "timer": {
       ".read": true,
       ".write": "auth !== null && auth.uid === 's5Ss40x2ZjaukMDedkWlRr73LZj1' && newData.exists()",
-      ".validate": "newData.hasChildren(['remainingMs', 'running', 'rate', 'updatedAt'])",
+      ".validate": "newData.hasChildren(['remainingMs', 'running', 'rate', 'direction', 'updatedAt'])",
       "remainingMs": {
-        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2880000"
+        ".validate": "newData.isNumber() && newData.val() >= 1000 && newData.val() <= 359999000"
       },
       "running": {
         ".validate": "newData.isBoolean()"
       },
       "rate": {
         ".validate": "newData.isNumber() && (newData.val() === 0.25 || newData.val() === 0.5 || newData.val() === 1 || newData.val() === 1.5 || newData.val() === 2 || newData.val() === 4)"
+      },
+      "direction": {
+        ".validate": "newData.val() === 'down' || newData.val() === 'up'"
       },
       "updatedAt": {
         ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= now + 60000"

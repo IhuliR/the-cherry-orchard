@@ -11,7 +11,7 @@ let lastDisplay = '';
 
 function update() {
   const remaining = connection ? remainingAt(state, connection.getNow()) : state.remainingMs;
-  const value = formatTime(remaining);
+  const value = formatTime(remaining, state.direction);
   if (lastDisplay !== value) {
     lastDisplay = value;
     digits.set(value);
